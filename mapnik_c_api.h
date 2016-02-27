@@ -68,13 +68,15 @@ MAPNIKCAPICALL const char * mapnik_map_get_srs(mapnik_map_t * m);
 
 MAPNIKCAPICALL int mapnik_map_set_srs(mapnik_map_t * m, const char* srs);
 
+MAPNIKCAPICALL double mapnik_map_get_scale_denominator(mapnik_map_t * m);
+
 MAPNIKCAPICALL int mapnik_map_load(mapnik_map_t * m, const char* stylesheet);
 
 MAPNIKCAPICALL int mapnik_map_load_string(mapnik_map_t * m, const char* stylesheet_string);
 
 MAPNIKCAPICALL int mapnik_map_zoom_all(mapnik_map_t * m);
 
-MAPNIKCAPICALL int mapnik_map_render_to_file(mapnik_map_t * m, const char* filepath);
+MAPNIKCAPICALL int mapnik_map_render_to_file(mapnik_map_t * m, const char* filepath, double scale, double scale_factor, const char *format);
 
 MAPNIKCAPICALL void mapnik_map_resize(mapnik_map_t * m, unsigned int width, unsigned int height);
 
@@ -84,7 +86,7 @@ MAPNIKCAPICALL void mapnik_map_zoom_to_box(mapnik_map_t * m, mapnik_bbox_t * b);
 
 MAPNIKCAPICALL mapnik_projection_t * mapnik_map_projection(mapnik_map_t *m);
 
-MAPNIKCAPICALL mapnik_image_t * mapnik_map_render_to_image(mapnik_map_t * m);
+MAPNIKCAPICALL mapnik_image_t * mapnik_map_render_to_image(mapnik_map_t * m, double scale, double scale_factor);
 
 #ifdef __cplusplus
 }

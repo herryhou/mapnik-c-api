@@ -91,6 +91,13 @@ int mapnik_map_set_srs(mapnik_map_t * m, const char* srs) {
     return -1;
 }
 
+double mapnik_map_get_scale_denominator(mapnik_map_t * m) {
+    if (m && m->m) {
+        return m->m->scale_denominator();
+    }
+    return 0.0;
+}
+
 int mapnik_map_load(mapnik_map_t * m, const char* stylesheet) {
     mapnik_map_reset_last_error(m);
     if (m && m->m) {
@@ -133,14 +140,18 @@ int mapnik_map_zoom_all(mapnik_map_t * m) {
     return -1;
 }
 
-int mapnik_map_render_to_file(mapnik_map_t * m, const char* filepath) {
+int mapnik_map_render_to_file(mapnik_map_t * m, const char* filepath, double scale, double scale_factor, const char *format) {
     mapnik_map_reset_last_error(m);
     if (m && m->m) {
         try {
             mapnik_image_type buf(m->m->width(),m->m->height());
-            mapnik::agg_renderer<mapnik_image_type> ren(*m->m,buf);
-            ren.apply();
-            mapnik::save_to_file(buf,filepath);
+            mapnik::agg_renderer<mapnik_image_type> ren(*m->m,buf, scale_factor);
+            if (scale > 0.0) {
+                ren.apply(scale);
+            } else {
+                ren.apply();
+            }
+            mapnik::save_to_file(buf, filepath, format);
         } catch (std::exception const& ex) {
             m->err = new std::string(ex.what());
             return -1;
@@ -230,13 +241,17 @@ void mapnik_image_free(mapnik_image_t * i) {
     }
 }
 
-mapnik_image_t * mapnik_map_render_to_image(mapnik_map_t * m) {
+mapnik_image_t * mapnik_map_render_to_image(mapnik_map_t * m, double scale, double scale_factor) {
     mapnik_map_reset_last_error(m);
     mapnik_image_type * im = new mapnik_image_type(m->m->width(), m->m->height());
     if (m && m->m) {
         try {
-            mapnik::agg_renderer<mapnik_image_type> ren(*m->m,*im);
-            ren.apply();
+            mapnik::agg_renderer<mapnik_image_type> ren(*m->m,*im, scale_factor);
+            if (scale > 0.0) {
+                ren.apply(scale);
+            } else {
+                ren.apply();
+            }
         } catch (std::exception const& ex) {
             delete im;
             m->err = new std::string(ex.what());
